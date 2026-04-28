@@ -1,0 +1,2 @@
+- name: run-ansible-lint
+  uses: ansible/ansible-lint@v26.4.0
