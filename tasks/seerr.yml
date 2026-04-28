@@ -1,10 +1,27 @@
 ---
-# tasks file for docker-seerr
+
+## Title: ansible-arr/tasks/seerr.yml
+## Description: Deploy Seerr in a docker container
+## Author: Joseph Harry <findarato@gmail.com>
+## Copyright: Joseph Harry <findarato@gmail.com>
+## Date: 2026-04-28 15:43:23
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## You should have received a copy of the GNU General Public License along
+## with this program; if not, write to the Free Software Foundation, Inc.
+## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
 
 - name: Install Python tools for docker
-  pip:
-    name: docker
-    state: latest
+  ansible.builtin.pip:
+    name: docker==7.1.0
   tags:
     - seerr
     - arr
@@ -19,10 +36,10 @@
 - name: 'Create directory for container data'
   ansible.builtin.file:
     path: "{{ docker_data_dir }}/{{ dir }}"
-    owner: 'docker'
-    group: 'docker'
-    mode: '0770'
-    state: 'directory'
+    state: directory
+    owner: docker
+    group: docker
+    mode: '0755'
   loop:
     - 'seerr_config'
   loop_control:
@@ -52,7 +69,7 @@
         aliases:
           - seerr
     log_driver: "{{ docker_log_driver }}"
-    log_options: "{{ docker_log_options}}"
+    log_options: "{{ docker_log_options }}"
     healthcheck:
       test: ["CMD", "wget", "-f --no-verbose --tries=1 --spider", "http://localhost:5055/api/v1/status"]
       interval: 30s

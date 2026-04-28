@@ -1,10 +1,26 @@
 ---
-# tasks file for docker-sonarr
+
+## Title: ansible-arr/tasks/radarr.yml
+## Description: Deploy radarr
+## Author: Joseph Harry <findarato@gmail.com>
+## Copyright: Joseph Harry <findarato@gmail.com>
+## Date: 2026-04-28 15:39:21
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## You should have received a copy of the GNU General Public License along
+## with this program; if not, write to the Free Software Foundation, Inc.
+## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 - name: Install Python tools for docker
-  pip:
-    name: docker
-    state: latest
+  ansible.builtin.pip:
+    name: docker==7.1.0
   tags:
     - radarr
     - arr
@@ -20,9 +36,12 @@
     - arr
 
 - name: Create Docker paths
-  file:
+  ansible.builtin.file:
     path: "{{ docker_data_dir }}{{ item }}"
     state: directory
+    owner: docker
+    group: docker
+    mode: '0755'
   with_items:
     - radarr_config
   tags:
@@ -90,6 +109,8 @@
       - "{{ docker_data_dir }}/radarr_config:/config"
     dns_search_domains: "{{ dns_domains }}"
     dns_servers: "{{ dns_servers }}"
+    log_driver: "{{ docker_log_driver }}"
+    log_options: "{{ docker_log_options }}"
     labels:
       traefik.enable: "true"
       traefik.http.routers.radarr.rule: Host(`{{ radarr_app_name }}.{{ traefik_arr_domain }}`)

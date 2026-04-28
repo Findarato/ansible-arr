@@ -22,7 +22,7 @@
 # tasks file for docker-deluge
 
 - name: Install Python tools for docker
-  pip:
+  ansible.builtin.pip:
     name: docker
     state: latest
   tags:
@@ -76,8 +76,8 @@
     image: "lscr.io/linuxserver/deluge:{{ deluge_version }}"
     state: started
     restart_policy: unless-stopped
-    recreate: yes
-    restart: yes
+    recreate: true
+    restart: true
     pull: true
     container_default_behavior: no_defaults
     volumes:

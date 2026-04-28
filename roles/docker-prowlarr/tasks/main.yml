@@ -2,7 +2,7 @@
 # tasks file for docker-prowlarr
 
 - name: Install Python tools for docker
-  pip:
+  ansible.builtin.pip:
     name: docker
     state: latest
   tags:

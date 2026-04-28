@@ -19,11 +19,9 @@
 ## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-
 - name: Install Python tools for docker
-  pip:
-    name: docker
-    state: latest
+  ansible.builtin.pip:
+    name: docker==7.1.0
 
 - name: Add lidarr to Arr network
   community.docker.docker_network:
@@ -33,12 +31,12 @@
     - arr
 
 - name: Create Docker paths
-  file:
+  ansible.builtin.file:
     path: "{{ docker_data_dir }}/{{ item }}"
     state: directory
-    mode: "0775"
-    owner: "1000"
+    owner: docker
     group: docker
+    mode: '0755'
   with_items:
     - downloads
     - config
@@ -89,6 +87,8 @@
       - "{{ docker_lidarr_storage }}/config:/config"
     dns_search_domains: "{{ dns_domains }}"
     dns_servers: "{{ dns_servers }}"
+    log_driver: "{{ docker_log_driver }}"
+    log_options: "{{ docker_log_options }}"
     networks_cli_compatible: false
     networks:
       - name: theways
@@ -106,3 +106,4 @@
       VERSION: latest
   tags:
     - lidarr
+    - arr

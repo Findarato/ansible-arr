@@ -59,16 +59,16 @@
   remote_user: ansible
   tasks:
     - name: Start Seerr container
-      ansible.builtin.include_tasks: tasks/arr/seerr.yml
+      ansible.builtin.include_tasks: tasks/seerr.yml
       tags: [seerr,arr]
     - name: Start Sonarr container
-      ansible.builtin.include_tasks: tasks/arr/sonarr.yml
+      ansible.builtin.include_tasks: tasks/sonarr.yml
       tags: [sonarr,arr]
     - name: Start Radarr container
-      ansible.builtin.include_tasks: tasks/arr/radarr.yml
+      ansible.builtin.include_tasks: tasks/radarr.yml
       tags: [radarr,arr]
     - name: Start Deluge container
-      ansible.builtin.include_tasks: tasks/arr/deluge.yml
+      ansible.builtin.include_tasks: tasks/deluge.yml
       tags: [deluge,torrent,arr]
   roles:
     - role: janitor
