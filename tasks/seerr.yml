@@ -37,8 +37,8 @@
     image: "ghcr.io/seerr-team/seerr:{{ seerr_version }}"
     state: started
     restart_policy: unless-stopped
-    recreate: yes
-    restart: yes
+    recreate: true
+    restart: true
     pull: true
     init: true
     volumes:
@@ -54,7 +54,7 @@
     log_driver: "{{ docker_log_driver }}"
     log_options: "{{ docker_log_options}}"
     healthcheck:
-      test: ["CMD", "wget", "-f --no-verbose --tries=1 --spider", "http://localhost:5055/api/v1/status"] 
+      test: ["CMD", "wget", "-f --no-verbose --tries=1 --spider", "http://localhost:5055/api/v1/status"]
       interval: 30s
       timeout: 10s
       retries: 3

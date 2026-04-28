@@ -103,8 +103,8 @@
     image: "lscr.io/linuxserver/sonarr:{{ sonarr_version }}"
     state: started
     restart_policy: "{{ docker_restart_condition }}"
-    recreate: yes
-    restart: yes
+    recreate: true
+    restart: true
     pull: true
     volumes:
       - /etc/localtime:/ect/localtime:ro
