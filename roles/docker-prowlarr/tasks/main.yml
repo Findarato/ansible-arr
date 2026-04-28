@@ -39,8 +39,8 @@
     image: lscr.io/linuxserver/prowlarr:latest
     state: started
     restart_policy: unless-stopped
-    recreate: yes
-    restart: yes
+    recreate: true
+    restart: true
     pull: true
     volumes:
       - /etc/localtime:/ect/localtime:ro

@@ -85,10 +85,10 @@
     name: 'traefik'
     image: 'traefik:{{ traefik3_version }}'
     state: started
-    recreate: yes
-    restart: yes
+    recreate: true
+    restart: true
     pull: true
-    restart_policy: "{{ docker_restart_condition  }}"
+    restart_policy: "{{ docker_restart_condition }}"
     dns_servers: "{{ public_dns_servers }}"
     # command:
     #   - '/usr/local/bin/traefik'
@@ -126,10 +126,10 @@
     name: 'whoami'
     image: "traefik/whoami"
     state: started
-    recreate: yes
-    restart: yes
+    recreate: true
+    restart: true
     pull: true
-    restart_policy: "{{ docker_restart_condition  }}"
+    restart_policy: "{{ docker_restart_condition }}"
     networks:
       - name: traefik_proxy
         aliases:
@@ -146,52 +146,3 @@
     - traefik
     - whoami
 
-# TODO: Fix this to work with swarm mode
-# - name: Deploy Docker Socket Proxy
-#   community.docker.docker_swarm_service:
-#   dockersocket:
-#     image: tecnativa/docker-socket-proxy
-#     volumes:
-#       - /var/run/docker.sock:/var/run/docker.sock
-#     environment:
-#       CONTAINERS: 1
-#       NETWORKS: 1
-#       SERVICES: 1
-#       SWARM: 1
-#       TASKS: 1
-#     deploy:
-#       mode: global
-#       placement:
-#         constraints:
-#           - "node.role==manager"
-#     networks:
-#       - traefik-socket
-
-
-# - name: install visualizer
-#   docker_swarm_service:
-#     name: visualizer
-#     # image: dockersamples/visualizer # X68
-#     image: alexellis2/visualizer-arm:latest #ARM
-#     state: absent
-#     force_update: true
-#     networks:
-#       - 'traefik_backend'
-#     mounts:
-#       - source: '/var/run/docker.sock'
-#         target: '/var/run/docker.sock'
-#         type: 'bind'
-#         readonly: true
-#     restart_config:
-#       condition: any
-#       delay: 10s
-#       # max_attempts: 5
-#     labels:
-#       traefik.enable: "true"
-#       traefik.swarmmode: "true"
-#       traefik.docker.network: "traefik_backend"
-#       traefik.http.routers.visu-public-http.rule: "Host(`visualizer.{{ traefik_domain_rk1 }}`)"
-#       traefik.http.routers.visu-public-http.entrypoints: "http"
-#       traefik.http.services.visu-public.loadbalancer.server.port: "8080"
-#     placement:
-#       constraints: "node.role==manager"
