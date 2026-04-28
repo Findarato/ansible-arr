@@ -1,0 +1,103 @@
+---
+
+ntp_enabled:          true
+ntp_timezone:         "America/Chicago"
+ntp_manage_config:    true
+
+ansible_become_password:  "{{ vault_ansible_become_pass  }}"
+ansible_ssh_pass:     "{{ vault_ansible_ssh_pass  }}"
+ansible_use:          ansible
+
+
+#General Docker stuff
+
+# Docker network
+docker_network:       theways
+
+docker_log_driver: "json-file"
+docker_log_options:
+  max-file: "3"   # number of files or file count
+  max-size: "10m" # file size
+
+docker_restart_condition: 'on-failure'
+dns_servers: ['10.1.1.1', '10.1.1.6']
+public_dns_servers: ['1.1.1.1', '8.8.8.8']
+dns_domains: ['mcharryville.space', 'arr.mcharryville.space']
+
+docker_users:
+  - joe
+
+
+# Storage Paths
+docker_storage_path: "/docker/containers"
+docker_data_dir: "{{ docker_storage_path }}"  # Older compatibility variable, will be removed in the future
+
+#    ▄▄▄█████▓ ██▀███   ▄▄▄      ▓█████   █████▒██▓ ██ ▄█▀    ██▒   █▓ ▄▄▄       ██▀███    ██████ 
+#    ▓  ██▒ ▓▒▓██ ▒ ██▒▒████▄    ▓█   ▀ ▓██   ▒▓██▒ ██▄█▒    ▓██░   █▒▒████▄    ▓██ ▒ ██▒▒██    ▒ 
+#    ▒ ▓██░ ▒░▓██ ░▄█ ▒▒██  ▀█▄  ▒███   ▒████ ░▒██▒▓███▄░     ▓██  █▒░▒██  ▀█▄  ▓██ ░▄█ ▒░ ▓██▄   
+#    ░ ▓██▓ ░ ▒██▀▀█▄  ░██▄▄▄▄██ ▒▓█  ▄ ░▓█▒  ░░██░▓██ █▄      ▒██ █░░░██▄▄▄▄██ ▒██▀▀█▄    ▒   ██▒
+#      ▒██▒ ░ ░██▓ ▒██▒ ▓█   ▓██▒░▒████▒░▒█░   ░██░▒██▒ █▄      ▒▀█░   ▓█   ▓██▒░██▓ ▒██▒▒██████▒▒
+#      ▒ ░░   ░ ▒▓ ░▒▓░ ▒▒   ▓▒█░░░ ▒░ ░ ▒ ░   ░▓  ▒ ▒▒ ▓▒      ░ ▐░   ▒▒   ▓▒█░░ ▒▓ ░▒▓░▒ ▒▓▒ ▒ ░
+#        ░      ░▒ ░ ▒░  ▒   ▒▒ ░ ░ ░  ░ ░      ▒ ░░ ░▒ ▒░      ░ ░░    ▒   ▒▒ ░  ░▒ ░ ▒░░ ░▒  ░ ░
+#      ░        ░░   ░   ░   ▒      ░    ░ ░    ▒ ░░ ░░ ░         ░░    ░   ▒     ░░   ░ ░  ░  ░  
+#                ░           ░  ░   ░  ░        ░  ░  ░            ░        ░  ░   ░           ░  
+#       
+
+
+traefik3_selfsign: false                           # Selfsign the used SSL certificate
+traefik3_version: '3.6'
+traefik_proxy_network: "traefik_proxy"
+traefik_arr_domain: 'arr.mcharryville.space'
+
+
+#      ▄████  ██▓     █    ██ ▓█████▄▄▄█████▓ █    ██  ███▄    █ 
+#     ██▒ ▀█▒▓██▒     ██  ▓██▒▓█   ▀▓  ██▒ ▓▒ ██  ▓██▒ ██ ▀█   █ 
+#    ▒██░▄▄▄░▒██░    ▓██  ▒██░▒███  ▒ ▓██░ ▒░▓██  ▒██░▓██  ▀█ ██▒
+#    ░▓█  ██▓▒██░    ▓▓█  ░██░▒▓█  ▄░ ▓██▓ ░ ▓▓█  ░██░▓██▒  ▐▌██▒
+#    ░▒▓███▀▒░██████▒▒▒█████▓ ░▒████▒ ▒██▒ ░ ▒▒█████▓ ▒██░   ▓██░
+#     ░▒   ▒ ░ ▒░▓  ░░▒▓▒ ▒ ▒ ░░ ▒░ ░ ▒ ░░   ░▒▓▒ ▒ ▒ ░ ▒░   ▒ ▒ 
+#      ░   ░ ░ ░ ▒  ░░░▒░ ░ ░  ░ ░  ░   ░    ░░▒░ ░ ░ ░ ░░   ░ ▒░
+#    ░ ░   ░   ░ ░    ░░░ ░ ░    ░    ░       ░░░ ░ ░    ░   ░ ░ 
+#          ░     ░  ░   ░        ░  ░           ░              ░ 
+
+gluetun_release: 'latest'                               # What version of the container to use
+gluetun_private_key: "{{ vault_gluetun_private_key }}"  # Wireguard private key from vault
+gluetun_addresses: "{{ vault_gluetun_addresses }}"      # Wireguard addresses from vault
+gluetun_countries: "{{ vault_gluetun_countries }}"      # Wireguard countries from vault
+gluetun_cities: "{{ vault_gluetun_cities }}"            # Wireguard cities from vault
+docker_gluetun_storage: "{{ docker_data_dir }}/gluetun/"
+
+#     ▄▄▄       ██▀███   ██▀███       ██████ ▄▄▄█████▓ ▄▄▄       ▄████▄  
+#    ▒████▄    ▓██ ▒ ██▒▓██ ▒ ██▒   ▒██    ▒ ▓  ██▒ ▓▒▒████▄    ▒██▀ ▀█  
+#    ▒██  ▀█▄  ▓██ ░▄█ ▒▓██ ░▄█ ▒   ░ ▓██▄   ▒ ▓██░ ▒░▒██  ▀█▄  ▒▓█    ▄ 
+#    ░██▄▄▄▄██ ▒██▀▀█▄  ▒██▀▀█▄       ▒   ██▒░ ▓██▓ ░ ░██▄▄▄▄██ ▒▓▓▄ ▄██▒
+#     ▓█   ▓██▒░██▓ ▒██▒░██▓ ▒██▒   ▒██████▒▒  ▒██▒ ░  ▓█   ▓██▒▒ ▓███▀ ░
+#     ▒▒   ▓▒█░░ ▒▓ ░▒▓░░ ▒▓ ░▒▓░   ▒ ▒▓▒ ▒ ░  ▒ ░░    ▒▒   ▓▒█░░ ░▒ ▒  ░
+#      ▒   ▒▒ ░  ░▒ ░ ▒░  ░▒ ░ ▒░   ░ ░▒  ░ ░    ░      ▒   ▒▒ ░  ░  ▒   
+#      ░   ▒     ░░   ░   ░░   ░    ░  ░  ░    ░        ░   ▒   ░        
+#          ░  ░   ░        ░              ░                 ░  ░░ ░      
+#        
+
+arr_network_name: "tortuga"
+sonarr_app_name: "sonarr"
+sonarr_version: "latest"
+
+radarr_app_name: "radarr"
+radarr_version: "latest"
+
+lidarr_app_name: "lidarr"
+deluge_app_name: "deluge"
+deluge_version: "latest"
+
+seerr_app_name: "seerr"
+seerr_version: "latest"
+
+prowlarr_app_name: "prowlarr"
+prowlarr_version: "latest"
+
+docker_sonarr_storage: "{{ docker_data_dir }}/sonarr/"
+docker_sonarr_storage_tv: "/mnt/storage/TV/"
+
+docker_prowlarr_storage: "{{ docker_data_dir }}/prowlarr/"
+docker_radarr_storage: "{{ docker_data_dir }}/radarr/"
+docker_lidarr_storage: "{{ docker_data_dir }}/lidarr/"

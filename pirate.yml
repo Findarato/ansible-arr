@@ -1,0 +1,97 @@
+---
+
+## Title: ~/Documents/src/Ansible/ansible-arr/pirate.yml
+## Description: Main Deployment script
+## Author: Joseph Harry <findarato@gmail.com>
+## Copyright: Joseph Harry <findarato@gmail.com>
+## Date: 2026-04-28 14:47:50
+## 
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## You should have received a copy of the GNU General Public License along
+## with this program; if not, write to the Free Software Foundation, Inc.
+## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
+
+
+# - hosts: pirate.mcharryville.space
+#   become: true
+#   remote_user: joe
+#   roles:
+#     - basic-server
+#     - geerlingguy.pip
+#     - geerlingguy.docker
+#   post_tasks:
+#     - name: clean up temp ansible
+#       ansible.builtin.file:
+#         path: /tmp/ansible
+#         state: absent
+#   vars:
+#     - ansible_python_interpreter: "/usr/bin/python3"
+#   vars_files:
+#     - vars/main.yml
+#     - vars/main.vault.yml
+#     - vars/setup.vault.yml
+
+
+# - hosts: pirate.mcharryville.space
+#   gather_facts: false
+#   remote_user: joe
+#   become: true
+#   roles:
+#     - arr/pirate-server-setup
+#   vars:
+#     - ansible_python_interpreter: "/usr/bin/python3"
+#   vars_files:
+#     - vars/main.yml
+#     - vars/main.vault.yml
+#     - vars/setup.vault.yml
+
+- hosts: pirate.mcharryville.space
+  become: true
+  remote_user: ansible
+  tasks:
+    - name: Start Seerr container
+      ansible.builtin.include_tasks: tasks/arr/seerr.yml
+      tags: [seerr,arr]
+    - name: Start Sonarr container
+      ansible.builtin.include_tasks: tasks/arr/sonarr.yml
+      tags: [sonarr,arr]
+    - name: Start Radarr container
+      ansible.builtin.include_tasks: tasks/arr/radarr.yml
+      tags: [radarr,arr]
+    - name: Start Deluge container
+      ansible.builtin.include_tasks: tasks/arr/deluge.yml
+      tags: [deluge,torrent,arr]
+  roles:
+    - role: janitor
+      tags: [ janitor ]
+    - role: docker-traefik
+      tags: [ proxy,traefik ]
+    - role: docker-prowlarr
+      tags: [ prowlarr, arr ]
+    # - role: docker-lidarr
+    #   tags: [ lidarr,arr ]
+    # - role: docker-gluetun
+    #   tags: [ vpn,gluetun,arr ]
+
+  post_tasks:
+    - name: clean up temp ansible
+      ansible.builtin.file:
+        path: /tmp/ansible
+        state: absent
+  vars:
+    - ansible_python_interpreter: "/usr/bin/python3"
+    - ansible_become_pass: "{{ vault_ansible_remote_user_password }}"
+    - arr_docker_network: "tortuga"
+    - traefik_arr_domain: 'arr.mcharryville.space'
+  vars_files:
+    - vars/main.yml
+    - vars/main.vault.yml

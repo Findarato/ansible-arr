@@ -1,0 +1,7 @@
+---
+# vars file for docker-grafana
+
+docker_ports:
+  - 7878/tcp
+
+radarr_version: "latest"
