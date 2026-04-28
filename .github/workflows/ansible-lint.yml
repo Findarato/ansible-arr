@@ -1,6 +1,8 @@
 # .github/workflows/ansible-lint.yml
-name: ansible-lint
+name: Run Ansible Lint on the packages
 on:
+  push:
+    branches: ["main", "stable", "release/v*"]
   pull_request:
     branches: ["main", "stable", "release/v*"]
 jobs:
