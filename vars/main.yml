@@ -62,6 +62,11 @@ traefik3_version: '3.6'
 traefik_proxy_network: "traefik_proxy"
 traefik_arr_domain: 'arr.mcharryville.space'
 
+docker_traefik:
+  docker_data_dir: "/docker_data/"
+  proxy_network_name: "traefik_proxy"
+  cf_api_token: "{{ vault_traefik_cf_api_token }}"
+
 
 #      ▄████  ██▓     █    ██ ▓█████▄▄▄█████▓ █    ██  ███▄    █
 #     ██▒ ▀█▒▓██▒     ██  ▓██▒▓█   ▀▓  ██▒ ▓▒ ██  ▓██▒ ██ ▀█   █

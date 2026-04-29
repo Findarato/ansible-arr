@@ -1,0 +1,82 @@
+---
+
+## Title: /ansible-arr/tasks/prowlarr.yml
+## Description: Deploy Prowlarr
+## Author: Joseph Harry <findarato@gmail.com>
+## Copyright: Joseph Harry <findarato@gmail.com>
+## Date: 2026-04-29 13:22:34
+##
+## This program is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation; either version 2 of the License, or
+## (at your option) any later version.
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+## You should have received a copy of the GNU General Public License along
+## with this program; if not, write to the Free Software Foundation, Inc.
+## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+
+- name: Install Python tools for docker
+  ansible.builtin.pip:
+    name: docker==7.1.0
+  tags:
+    - prowlarr
+    - arr
+
+- name: Add prowlarr to Arr network
+  community.docker.docker_network:
+    name: "{{ arr_network_name }}"
+    labels:
+      arr: "true"
+  tags:
+    - prowlarr
+    - arr
+
+- name: 'Create directory for container data'
+  ansible.builtin.file:
+    path: "{{ docker_data_dir }}/{{ dir }}"
+    owner: 'docker'
+    group: 'docker'
+    mode: '0750'
+    state: 'directory'
+  loop:
+    - 'prowlarr_config'
+  loop_control:
+    loop_var: 'dir'
+  tags:
+    - prowlarr
+    - arr
+
+- name: Recreate prowlarr container
+  community.docker.docker_container:
+    name: prowlarr
+    image: lscr.io/linuxserver/prowlarr:latest
+    state: started
+    restart_policy: unless-stopped
+    recreate: true
+    restart: true
+    pull: true
+    volumes:
+      - /etc/localtime:/ect/localtime:ro
+      - "{{ docker_prowlarr_storage }}/prowlarr_config:/config"
+    networks_cli_compatible: false
+    networks:
+      - name: "{{ arr_network_name }}"
+      - name: "{{ traefik_proxy_network }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.prowlarr.rule: Host(`{{ prowlarr_app_name }}.{{ traefik_arr_domain }}`)
+      traefik.http.routers.prowlarr.tls: "true"
+      traefik.http.routers.prowlarr.entrypoints: websecure
+      traefik.http.services.prowlarr.loadbalancer.server.port: "9696"
+    env:
+      TZ: "America/Chicago"
+      PUID: '1000'
+      PGID: '1000'
+      VERSION: latest
+  tags:
+    - prowlarr
+    - arr
