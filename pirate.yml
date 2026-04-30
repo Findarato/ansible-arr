@@ -19,8 +19,6 @@
 ## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-
-
 # - hosts: pirate.mcharryville.space
 #   become: true
 #   remote_user: joe
@@ -54,44 +52,47 @@
 #     - vars/main.vault.yml
 #     - vars/setup.vault.yml
 
-- hosts: pirate.mcharryville.space
+- name: Deploy Arr stack
+  hosts: pirate.mcharryville.space
   become: true
   remote_user: ansible
   tasks:
     - name: Start Seerr container
-      ansible.builtin.include_tasks: tasks/arr/seerr.yml
-      tags: [seerr,arr]
+      ansible.builtin.include_tasks: tasks/seerr.yml
+      tags: [ seerr, arr ]
     - name: Start Sonarr container
-      ansible.builtin.include_tasks: tasks/arr/sonarr.yml
-      tags: [sonarr,arr]
+      ansible.builtin.include_tasks: tasks/sonarr.yml
+      tags: [ sonarr, arr ]
     - name: Start Radarr container
-      ansible.builtin.include_tasks: tasks/arr/radarr.yml
-      tags: [radarr,arr]
+      ansible.builtin.include_tasks: tasks/radarr.yml
+      tags: [ radarr, arr ]
+    - name: Start Prowlarr container
+      ansible.builtin.include_tasks: tasks/prowlarr.yml
+      tags: [ prowlarr, arr ]
     - name: Start Deluge container
-      ansible.builtin.include_tasks: tasks/arr/deluge.yml
-      tags: [deluge,torrent,arr]
+      ansible.builtin.include_tasks: tasks/deluge.yml
+      tags: [ deluge, torrent, arr ]
   roles:
     - role: janitor
       tags: [ janitor ]
-    - role: docker-traefik
-      tags: [ proxy,traefik ]
-    - role: docker-prowlarr
-      tags: [ prowlarr, arr ]
-    # - role: docker-lidarr
+    - role: docker_traefik
+      tags: [ proxy, traefik ]
+    # - role: docker_prowlarr
+    #   tags: [ prowlarr, arr ]
+    # - role: docker_lidarr
     #   tags: [ lidarr,arr ]
-    # - role: docker-gluetun
+    # - role: docker_gluetun
     #   tags: [ vpn,gluetun,arr ]
-
   post_tasks:
-    - name: clean up temp ansible
+    - name: Clean up temp ansible
       ansible.builtin.file:
         path: /tmp/ansible
         state: absent
   vars:
-    - ansible_python_interpreter: "/usr/bin/python3"
-    - ansible_become_pass: "{{ vault_ansible_remote_user_password }}"
-    - arr_docker_network: "tortuga"
-    - traefik_arr_domain: 'arr.mcharryville.space'
+    ansible_python_interpreter: "/usr/bin/python3"
+    ansible_become_pass: "{{ vault_ansible_remote_user_password }}"
+    arr_docker_network: "tortuga"
+    traefik_arr_domain: 'arr.mcharryville.space'
   vars_files:
     - vars/main.yml
     - vars/main.vault.yml

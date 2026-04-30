@@ -1,10 +1,10 @@
 ---
 
-## Title: ansible-arr/tasks/seerr.yml
-## Description: Deploy Seerr in a docker container
+## Title: /ansible-arr/tasks/prowlarr.yml
+## Description: Deploy Prowlarr
 ## Author: Joseph Harry <findarato@gmail.com>
 ## Copyright: Joseph Harry <findarato@gmail.com>
-## Date: 2026-04-28 15:43:23
+## Date: 2026-04-29 13:22:34
 ##
 ## This program is free software; you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -23,67 +23,60 @@
   ansible.builtin.pip:
     name: docker==7.1.0
   tags:
-    - seerr
+    - prowlarr
     - arr
 
-- name: Add seerr to Arr network
+- name: Add prowlarr to Arr network
   community.docker.docker_network:
     name: "{{ arr_network_name }}"
+    labels:
+      arr: "true"
   tags:
-    - seerr
+    - prowlarr
     - arr
 
 - name: 'Create directory for container data'
   ansible.builtin.file:
     path: "{{ docker_data_dir }}/{{ dir }}"
-    state: directory
-    owner: docker
-    group: docker
-    mode: '0755'
+    owner: 'docker'
+    group: 'docker'
+    mode: '0750'
+    state: 'directory'
   loop:
-    - 'seerr_config'
+    - 'prowlarr_config'
   loop_control:
     loop_var: 'dir'
   tags:
-    - seerr
+    - prowlarr
     - arr
 
-- name: Recreate seerr container
+- name: Recreate prowlarr container
   community.docker.docker_container:
-    name: "{{ seerr_app_name }}"
-    image: "ghcr.io/seerr-team/seerr:{{ seerr_version }}"
+    name: prowlarr
+    image: lscr.io/linuxserver/prowlarr:latest
     state: started
     restart_policy: unless-stopped
     recreate: true
     restart: true
     pull: true
-    init: true
     volumes:
-      - "{{ docker_data_dir }}/seerr_config:/config"
-    dns_search_domains: "{{ dns_domains }}"
-    dns_servers: "{{ dns_servers }}"
+      - /etc/localtime:/ect/localtime:ro
+      - "{{ docker_data_dir }}/prowlarr_config:/config"
     networks_cli_compatible: false
     networks:
       - name: "{{ arr_network_name }}"
-      - name: traefik_proxy
-        aliases:
-          - seerr
-    log_driver: "{{ docker_log_driver }}"
-    log_options: "{{ docker_log_options }}"
-    healthcheck:
-      test: ["CMD", "wget", "-f --no-verbose --tries=1 --spider", "http://localhost:5055/api/v1/status"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    env:
-      TZ: "America/Chicago"
+      - name: "{{ traefik_proxy_network }}"
     labels:
       traefik.enable: "true"
-      traefik.http.routers.seerr.rule: Host(`{{ seerr_app_name }}.{{ traefik_arr_domain }}`)
-      traefik.http.routers.seerr.tls: "true"
-      traefik.http.routers.seerr.entrypoints: websecure
-      traefik.http.services.seerr.loadbalancer.server.port: "5055"
+      traefik.http.routers.prowlarr.rule: Host(`{{ prowlarr_app_name }}.{{ traefik_arr_domain }}`)
+      traefik.http.routers.prowlarr.tls: "true"
+      traefik.http.routers.prowlarr.entrypoints: websecure
+      traefik.http.services.prowlarr.loadbalancer.server.port: "9696"
+    env:
+      TZ: "America/Chicago"
+      PUID: '1000'
+      PGID: '1000'
+      VERSION: latest
   tags:
-    - seerr
+    - prowlarr
     - arr
