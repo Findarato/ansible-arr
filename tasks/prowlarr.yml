@@ -61,7 +61,7 @@
     pull: true
     volumes:
       - /etc/localtime:/ect/localtime:ro
-      - "{{ docker_prowlarr_storage }}/prowlarr_config:/config"
+      - "{{ docker_data_dir }}/prowlarr_config:/config"
     networks_cli_compatible: false
     networks:
       - name: "{{ arr_network_name }}"

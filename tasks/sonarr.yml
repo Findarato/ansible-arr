@@ -94,14 +94,14 @@
     - sonarr
     - arr
 
-- name: Remove NFS mount downloads
-  community.docker.docker_volume:
-    name: arr-downloads
-    state: absent
-    driver: local
-  tags:
-    - sonarr
-    - arr
+# - name: Remove NFS mount downloads
+#   community.docker.docker_volume:
+#     name: arr-downloads
+#     state: absent
+#     driver: local
+#   tags:
+#     - sonarr
+#     - arr
 
 - name: Create NFS mount downloads
   community.docker.docker_volume:

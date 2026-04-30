@@ -19,7 +19,8 @@
 ## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+
 docker_traefik_vars:
   docker_data_dir: "/docker_data/"
   proxy_network_name: "traefik_proxy"
-  cf_api_token: "{{ vault_traefik_cf_api_token }}"
+  cf_api_token: "{{ vault_cf_api_token }}"
