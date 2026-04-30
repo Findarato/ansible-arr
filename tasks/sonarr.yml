@@ -159,3 +159,40 @@
   tags:
     - sonarr
     - arr
+
+- name: Create Exportarr Sonarr
+  community.docker.docker_container:
+    name: exportarr_sonarr
+    image: ghcr.io/onedr0p/exportarr:latest
+    state: started
+    restart_policy: unless-stopped
+    recreate: true
+    restart: true
+    pull: true
+    exposed_ports:
+      - '9707'
+    dns_search_domains: "{{ dns_domains }}"
+    dns_servers: "{{ dns_servers }}"
+    log_driver: "{{ docker_log_driver }}"
+    log_options: "{{ docker_log_options }}"
+    networks_cli_compatible: false
+    networks:
+      - name: "{{ arr_network_name }}"
+        aliases:
+          - sonarr.mcharryville.space
+          - sonarr.arr.mcharryville.space
+          - sonarr
+      - name: "{{ traefik_proxy_network }}"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.sonarr.rule: Host(`exportarr-sonarr.{{ traefik_arr_domain }}`)
+      traefik.http.routers.sonarr.tls: "true"
+      traefik.http.routers.sonarr.entrypoints: websecure
+      traefik.http.services.sonarr.loadbalancer.server.port: "9707"
+    env:
+      port: "9707"
+      APIKEY: "{{ vault_exportarr_sonarr_apikey }}"
+      URL: "http://sonarr:8989"
+  tags:
+    - sonarr
+    - arr
