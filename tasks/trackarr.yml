@@ -19,6 +19,8 @@
 ## 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+# https://github.com/leandrobattochio/trackarr
+
 - name: Install Python tools for docker
   ansible.builtin.pip:
     name: docker==7.1.0
@@ -44,96 +46,89 @@
     group: docker
     mode: '0755'
   with_items:
-    - radarr_config
+    - trackarr_data
+    - trackarr_data/db
   tags:
-    - radarr
+    - trackarr
     - arr
 
-- name: 🛑 Stop Radarr container
-  community.docker.docker_container:
-    name: radarr
-    image: "lscr.io/linuxserver/radarr:{{ radarr_version }}"
-    state: stopped
-  tags:
-    - radarr
-    - arr
 
-- name: 🔥 Remove Radarr container
+- name: Recreate trackarr-db container
   community.docker.docker_container:
-    name: radarr
+    name: trackarr-db
+    image: postgres:17-alpine
     state: absent
-  tags:
-    - radarr
-    - arr
-
-- name: 📺 Create NFS mount TV
-  community.docker.docker_volume:
-    name: nfs-tv
-    state: present
-    driver: local
-    recreate: options-changed
-    driver_options:
-      type: "{{ vault_arr_tv_mount.type }}"
-      o: "{{ vault_arr_tv_mount.opts }}"
-      device: "{{ vault_arr_tv_mount.device }}"
-  tags:
-    - radarr
-    - arr
-
-- name: Create NFS mount downloads
-  community.docker.docker_volume:
-    name: arr-downloads
-    state: present
-    driver: local
-    recreate: options-changed
-    driver_options:
-      type: "{{ vault_arr_downloads_mount.type }}"
-      o: "{{ vault_arr_downloads_mount.opts }}"
-      device: "{{ vault_arr_downloads_mount.device }}"
-  tags:
-    - radarr
-    - arr
-
-- name: Recreate Radarr container
-  community.docker.docker_container:
-    name: radarr
-    image: lscr.io/linuxserver/radarr:{{ radarr_version }}
-    state: started
     restart_policy: unless-stopped
     recreate: true
     restart: true
     pull: true
     volumes:
       - /etc/localtime:/ect/localtime:ro
-      - "arr-downloads:/downloads"
-      - "nfs-movies:/movies"
-      - "{{ docker_data_dir }}/radarr_config:/config"
+      - "{{ docker_data_dir }}/trackarr_data/db:/var/lib/postgresql/data"
+    dns_search_domains: "{{ dns_domains }}"
+    dns_servers: "{{ dns_servers }}"
+    log_driver: "{{ docker_log_driver }}"
+    log_options: "{{ docker_log_options }}"
+    networks_cli_compatible: false
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U arr -d trackarr"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - name: "{{ arr_network_name }}"
+        aliases:
+          - trackarr-db.mcharryville.space
+          - trackarr-db.arr.mcharryville.space
+          - trackarr-db
+    env:
+      POSTGRES_DB: trackarr
+      POSTGRES_USER: arr
+      POSTGRES_PASSWORD: "{{ trackarr_db_password }}"
+  tags:
+    - trackarr
+    - arr
+
+- name: Recreate trackarr container
+  community.docker.docker_container:
+    name: trackarr
+    image: ghcr.io/leandrobattochio/trackarr:{{ trackarr_version }}
+    state: absent
+    restart_policy: unless-stopped
+    recreate: true
+    restart: true
+    pull: true
+    volumes:
+      - /etc/localtime:/ect/localtime:ro
+      - "{{ docker_data_dir }}/trackarr_config:/config"
     dns_search_domains: "{{ dns_domains }}"
     dns_servers: "{{ dns_servers }}"
     log_driver: "{{ docker_log_driver }}"
     log_options: "{{ docker_log_options }}"
     labels:
       traefik.enable: "true"
-      traefik.http.routers.radarr.rule: Host(`{{ radarr_app_name }}.{{ traefik_arr_domain }}`)
-      traefik.http.routers.radarr.tls: "true"
-      traefik.http.routers.radarr.entrypoints: websecure
-      traefik.http.services.radarr.loadbalancer.server.port: "7878"
+      traefik.http.routers.trackarr.rule: Host(`{{ trackarr_app_name }}.{{ traefik_arr_domain }}`)
+      traefik.http.routers.trackarr.tls: "true"
+      traefik.http.routers.trackarr.entrypoints: websecure
+      traefik.http.services.trackarr.loadbalancer.server.port: "3000"
     networks_cli_compatible: false
     networks:
       - name: "{{ arr_network_name }}"
         aliases:
-          - radarr.mcharryville.space
-          - radarr.arr.mcharryville.space
-          - radarr
+          - trackarr.mcharryville.space
+          - trackarr.arr.mcharryville.space
+          - trackarr
       - name: traefik_proxy
         aliases:
-          - radarr.mcharryville.space
-          - radarr
+          - trackarr.mcharryville.space
+          - trackarr
     env:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      APP_TIMEZONE: "America/Chicago"
+      ConnectionStrings__PostgresConnection: Host=trackarr-db;Port=5432;Database=trackarr;Username=arr;Password="{{ trackarr_db_password }}"
+      Hangfire__Directory: /data
+      Plugins__Directory: /data
       TZ: "America/Chicago"
-      PUID: '1000'
-      PGID: '1000'
-      VERSION: latest
   tags:
-    - radarr
+    - trackarr
     - arr

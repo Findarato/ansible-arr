@@ -62,6 +62,8 @@
     volumes:
       - /etc/localtime:/ect/localtime:ro
       - "{{ docker_data_dir }}/prowlarr_config:/config"
+    dns_search_domains: "{{ dns_domains }}"
+    dns_servers: "{{ dns_servers }}"
     networks_cli_compatible: false
     networks:
       - name: "{{ arr_network_name }}"

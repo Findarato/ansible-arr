@@ -36,7 +36,7 @@ docker_log_options:
   max-size: "10m" # file size
 
 docker_restart_condition: 'on-failure'
-dns_servers: ['10.1.1.1', '10.1.1.6']
+dns_servers: ['10.1.1.6', '10.1.1.21']
 public_dns_servers: ['1.1.1.1', '8.8.8.8']
 dns_domains: ['mcharryville.space', 'arr.mcharryville.space']
 
@@ -114,3 +114,7 @@ prowlarr_app_name: "prowlarr"
 prowlarr_version: "latest"
 
 docker_sonarr_storage_tv: "/mnt/storage/TV/"
+
+trackarr_app_name: "trackarr"
+trackarr_version: "v0.2.2"
+trackarr_db_password: "{{ vault_trackarr_db_password }}"

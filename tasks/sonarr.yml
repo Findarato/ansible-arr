@@ -38,7 +38,7 @@
 
 - name: Create Docker paths
   ansible.builtin.file:
-    path: "{{ docker_data_dir }}{{ item }}"
+    path: "{{ docker_data_dir }}/{{ item }}"
     state: directory
     owner: docker
     group: docker
@@ -80,16 +80,16 @@
 #     - sonarr
 #     - arr
 
-- name: 📺 Create NFS mount TV
+- name: 🎥 Create NFS mount movies
   community.docker.docker_volume:
-    name: nfs-tv
+    name: nfs-movies
     state: present
     driver: local
     recreate: options-changed
     driver_options:
-      type: "{{ vault_arr_tv_mount.type }}"
-      o: "{{ vault_arr_tv_mount.opts }}"
-      device: "{{ vault_arr_tv_mount.device }}"
+      type: "{{ vault_arr_movies_mount.type }}"
+      o: "{{ vault_arr_movies_mount.opts }}"
+      device: "{{ vault_arr_movies_mount.device }}"
   tags:
     - sonarr
     - arr

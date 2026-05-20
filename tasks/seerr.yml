@@ -35,15 +35,13 @@
 
 - name: 'Create directory for container data'
   ansible.builtin.file:
-    path: "{{ docker_data_dir }}/{{ dir }}"
+    path: "{{ docker_data_dir }}/{{ item }}"
     state: directory
     owner: docker
     group: docker
     mode: '0755'
   loop:
     - 'seerr_config'
-  loop_control:
-    loop_var: 'dir'
   tags:
     - seerr
     - arr
