@@ -164,8 +164,8 @@
   community.docker.docker_container:
     name: exportarr_sonarr
     image: ghcr.io/onedr0p/exportarr:latest
-    state: started
-    restart_policy: unless-stopped
+    state: absent
+    restart_policy: "{{ docker_restart_condition }}"
     recreate: true
     restart: true
     pull: true
@@ -193,6 +193,7 @@
       port: "9707"
       APIKEY: "{{ vault_exportarr_sonarr_apikey }}"
       URL: "http://sonarr:8989"
+
   tags:
     - sonarr
     - arr

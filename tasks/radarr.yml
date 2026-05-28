@@ -99,7 +99,7 @@
     name: radarr
     image: lscr.io/linuxserver/radarr:{{ radarr_version }}
     state: started
-    restart_policy: unless-stopped
+    restart_policy: "{{ docker_restart_condition }}"
     recreate: true
     restart: true
     pull: true

@@ -55,7 +55,7 @@
     name: prowlarr
     image: lscr.io/linuxserver/prowlarr:latest
     state: started
-    restart_policy: unless-stopped
+    restart_policy: "{{ docker_restart_condition }}"
     recreate: true
     restart: true
     pull: true

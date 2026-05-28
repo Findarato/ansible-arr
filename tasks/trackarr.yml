@@ -94,7 +94,7 @@
     name: trackarr
     image: ghcr.io/leandrobattochio/trackarr:{{ trackarr_version }}
     state: absent
-    restart_policy: unless-stopped
+    restart_policy: "{{ docker_restart_condition }}"
     recreate: true
     restart: true
     pull: true

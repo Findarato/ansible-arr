@@ -69,6 +69,9 @@
     - name: Start Prowlarr container
       ansible.builtin.include_tasks: tasks/prowlarr.yml
       tags: [ prowlarr, arr ]
+    - name: Start Profilarr container
+      ansible.builtin.include_tasks: tasks/profilarr.yml
+      tags: [ profilarr, arr ]
     # Not as useful as I thought, it is off by default and I don't use it, so just leave it off for now 
     # - name: Start Trackarr container
     #   ansible.builtin.include_tasks: tasks/trackarr.yml

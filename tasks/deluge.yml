@@ -72,7 +72,7 @@
     name: deluge
     image: "lscr.io/linuxserver/deluge:{{ deluge_version }}"
     state: started
-    restart_policy: unless-stopped
+    restart_policy: "{{ docker_restart_condition }}"
     recreate: true
     restart: true
     pull: true

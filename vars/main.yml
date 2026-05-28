@@ -35,7 +35,7 @@ docker_log_options:
   max-file: "3"   # number of files or file count
   max-size: "10m" # file size
 
-docker_restart_condition: 'on-failure'
+docker_restart_condition: 'unless-stopped'
 dns_servers: ['10.1.1.6', '10.1.1.21']
 public_dns_servers: ['1.1.1.1', '8.8.8.8']
 dns_domains: ['mcharryville.space', 'arr.mcharryville.space']
@@ -112,6 +112,9 @@ seerr_version: "latest"
 
 prowlarr_app_name: "prowlarr"
 prowlarr_version: "latest"
+
+profilarr_app_name: "profilarr"
+profilarr_version: "latest"
 
 docker_sonarr_storage_tv: "/mnt/storage/TV/"
 

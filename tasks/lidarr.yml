@@ -75,7 +75,7 @@
     name: lidarr
     image: lscr.io/linuxserver/lidarr
     state: started
-    restart_policy: unless-stopped
+    restart_policy: "{{ docker_restart_condition }}"
     recreate: true
     restart: true
     pull: true
