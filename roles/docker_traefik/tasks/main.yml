@@ -90,11 +90,6 @@
     pull: true
     restart_policy: "{{ docker_restart_condition }}"
     dns_servers: "{{ public_dns_servers }}"
-    # command:
-    #   - '/usr/local/bin/traefik'
-    #   - '--entrypoints.websecure.http.tls=true'
-    #   - '--providers.docker.watch'
-    #   - '--providers.file.filename=/traefik.yml'
     labels:
       traefik.http.routers.websecure.tls.certresolver: "cloudflare"
       traefik.http.routers.websecure.tls.domains[0].main: "*.mcharryville.space"
